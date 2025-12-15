@@ -250,5 +250,3 @@ LumaAPIError (500)
 ### 7. **Observability**
 - Current: Basic logging
 - Improvement: OpenTelemetry, Prometheus metrics, Jaeger tracing
-
----
