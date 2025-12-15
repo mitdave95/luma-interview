@@ -4,6 +4,7 @@ import logging
 import time
 import uuid
 from dataclasses import dataclass
+from typing import Any
 
 from redis.asyncio import Redis
 
@@ -85,10 +86,13 @@ class RateLimitService:
         now = time.time()
         request_id = str(uuid.uuid4())
 
+        redis = self._redis
+        assert redis is not None
+
         try:
             # Use Lua script for atomic operation
             if lua_scripts.rate_limit_sha:
-                result = await self._redis.evalsha(
+                result: Any = await redis.evalsha(  # type: ignore[misc]
                     lua_scripts.rate_limit_sha,
                     1,
                     key,
@@ -99,7 +103,7 @@ class RateLimitService:
                 )
             else:
                 # Fallback to inline script
-                result = await self._redis.eval(
+                result = await redis.eval(  # type: ignore[misc]
                     RATE_LIMIT_SCRIPT,
                     1,
                     key,
@@ -225,7 +229,7 @@ class RateLimitService:
             window_seconds=window_seconds,
         )
 
-    async def get_all_user_limits(self) -> dict[str, dict]:
+    async def get_all_user_limits(self) -> dict[str, dict[str, Any]]:
         """
         Get rate limit status for all mock users.
 

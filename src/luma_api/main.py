@@ -1,6 +1,7 @@
 """FastAPI application entry point."""
 
 import logging
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -18,6 +19,7 @@ from luma_api.routes import (
     generate_router,
     health_router,
     jobs_router,
+    scrape_router,
     videos_router,
     websocket_router,
 )
@@ -36,7 +38,7 @@ logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """
     Application lifespan handler.
 
@@ -119,7 +121,7 @@ def create_app() -> FastAPI:
     )
 
     # Add rate limiting middleware
-    app.add_middleware(RateLimitMiddleware)
+    app.add_middleware(RateLimitMiddleware)  # type: ignore[arg-type]
 
     # Register exception handlers
     register_exception_handlers(app)
@@ -131,6 +133,7 @@ def create_app() -> FastAPI:
     app.include_router(jobs_router, prefix=settings.api_prefix)
     app.include_router(account_router, prefix=settings.api_prefix)
     app.include_router(admin_router, prefix=settings.api_prefix)
+    app.include_router(scrape_router, prefix=settings.api_prefix)
     app.include_router(websocket_router)  # WebSocket at root level
 
     return app

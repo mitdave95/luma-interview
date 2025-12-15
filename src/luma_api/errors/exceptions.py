@@ -5,7 +5,7 @@ from typing import Any
 from luma_api.config import UserTier
 
 
-class LumaAPIException(Exception):
+class LumaAPIError(Exception):
     """Base exception for all Luma API errors."""
 
     status_code: int = 500
@@ -25,7 +25,7 @@ class LumaAPIException(Exception):
 # Authentication Errors (401)
 
 
-class AuthenticationError(LumaAPIException):
+class AuthenticationError(LumaAPIError):
     """Base authentication error."""
 
     status_code = 401
@@ -57,7 +57,7 @@ class MissingCredentialsError(AuthenticationError):
 # Authorization Errors (403)
 
 
-class AuthorizationError(LumaAPIException):
+class AuthorizationError(LumaAPIError):
     """Base authorization error."""
 
     status_code = 403
@@ -128,7 +128,7 @@ class QuotaExceededError(AuthorizationError):
 # Rate Limit Errors (429)
 
 
-class RateLimitError(LumaAPIException):
+class RateLimitError(LumaAPIError):
     """Base rate limit error."""
 
     status_code = 429
@@ -165,7 +165,7 @@ class TooManyRequestsError(RateLimitError):
 # Validation Errors (400)
 
 
-class ValidationError(LumaAPIException):
+class ValidationError(LumaAPIError):
     """Base validation error."""
 
     status_code = 400
@@ -190,7 +190,7 @@ class InvalidParametersError(ValidationError):
 # Queue Errors
 
 
-class QueueError(LumaAPIException):
+class QueueError(LumaAPIError):
     """Base queue error."""
 
     status_code = 503
@@ -205,7 +205,7 @@ class QueueFullError(QueueError):
     message = "The processing queue is full, please try again later"
 
 
-class JobNotFoundError(LumaAPIException):
+class JobNotFoundError(LumaAPIError):
     """Job not found."""
 
     status_code = 404
@@ -219,7 +219,7 @@ class JobNotFoundError(LumaAPIException):
         )
 
 
-class JobCancelledError(LumaAPIException):
+class JobCancelledError(LumaAPIError):
     """Job was cancelled."""
 
     status_code = 409
@@ -230,7 +230,7 @@ class JobCancelledError(LumaAPIException):
 # Generation Errors
 
 
-class GenerationError(LumaAPIException):
+class GenerationError(LumaAPIError):
     """Base generation error."""
 
     status_code = 500
@@ -265,7 +265,7 @@ class GenerationTimeoutError(GenerationError):
 # Resource Not Found Errors (404)
 
 
-class VideoNotFoundError(LumaAPIException):
+class VideoNotFoundError(LumaAPIError):
     """Video not found."""
 
     status_code = 404
@@ -282,7 +282,7 @@ class VideoNotFoundError(LumaAPIException):
 # Internal Errors (500)
 
 
-class InternalError(LumaAPIException):
+class InternalError(LumaAPIError):
     """Base internal error."""
 
     status_code = 500

@@ -55,7 +55,7 @@ async def health_check() -> HealthResponse:
     summary="Root",
     description="API root endpoint with basic info.",
 )
-async def root():
+async def root() -> dict[str, str]:
     """Root endpoint with API info."""
     return {
         "name": "Luma Labs Enterprise API",

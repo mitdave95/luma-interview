@@ -104,7 +104,7 @@ class InMemoryStorage(Generic[T]):
 class UsageCounter:
     """Track usage counts with time-based keys."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._daily: dict[str, int] = {}  # key: "user_id:YYYY-MM-DD"
         self._monthly: dict[str, int] = {}  # key: "user_id:YYYY-MM"
 
@@ -149,7 +149,7 @@ class StorageManager:
 
     _instance: Optional["StorageManager"] = None
 
-    def __init__(self):
+    def __init__(self) -> None:
         from luma_api.models.job import Job
         from luma_api.models.user import User
         from luma_api.models.video import Video
@@ -157,7 +157,7 @@ class StorageManager:
         self.videos: InMemoryStorage[Video] = InMemoryStorage[Video]()
         self.jobs: InMemoryStorage[Job] = InMemoryStorage[Job]()
         self.users: InMemoryStorage[User] = InMemoryStorage[User]()
-        self.usage = UsageCounter()
+        self.usage: UsageCounter = UsageCounter()
         self._usage_details: dict[str, dict[str, Any]] = {}
 
     @classmethod

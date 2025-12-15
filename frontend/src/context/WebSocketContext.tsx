@@ -32,6 +32,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reconnectAttempts = useRef(0);
+  const connectRef = useRef<() => void>(() => {});
 
   const connect = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
@@ -73,7 +74,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         reconnectAttempts.current++;
 
         reconnectTimeoutRef.current = setTimeout(() => {
-          connect();
+          connectRef.current();
         }, delay);
       };
 
@@ -84,6 +85,11 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       setStatus('error');
     }
   }, []);
+
+  // Keep connectRef in sync with connect
+  useEffect(() => {
+    connectRef.current = connect;
+  }, [connect]);
 
   const reconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) {
@@ -97,6 +103,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   }, [connect]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- WebSocket connection requires state updates
     connect();
 
     return () => {
@@ -116,6 +123,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useWebSocket() {
   const context = useContext(WebSocketContext);
   if (!context) {

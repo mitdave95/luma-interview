@@ -4,6 +4,7 @@ import logging
 import random
 import time
 from dataclasses import dataclass
+from typing import Any
 
 from redis.asyncio import Redis
 
@@ -100,10 +101,12 @@ class PriorityQueue:
     ) -> int:
         """Enqueue using Redis."""
         key = self.QUEUE_KEYS[priority]
+        redis = self._redis
+        assert redis is not None
 
         try:
             if lua_scripts.queue_enqueue_sha:
-                position = await self._redis.evalsha(
+                position: Any = await redis.evalsha(  # type: ignore[misc]
                     lua_scripts.queue_enqueue_sha,
                     1,
                     key,
@@ -111,8 +114,8 @@ class PriorityQueue:
                     score,
                 )
             else:
-                await self._redis.zadd(key, {job_id: score})
-                position = await self._redis.zrank(key, job_id)
+                await redis.zadd(key, {job_id: score})
+                position = await redis.zrank(key, job_id)
                 position = (position or 0) + 1
 
             return int(position)
@@ -175,24 +178,25 @@ class PriorityQueue:
     async def _pop_from_redis_queue(self, priority: QueuePriority) -> str | None:
         """Pop the oldest job from a Redis queue."""
         key = self.QUEUE_KEYS[priority]
+        redis = self._redis
+        assert redis is not None
 
         try:
             if lua_scripts.queue_dequeue_sha:
-                result = await self._redis.evalsha(
+                result: Any = await redis.evalsha(  # type: ignore[misc]
                     lua_scripts.queue_dequeue_sha,
                     1,
                     key,
                 )
+                return str(result) if result else None
             else:
                 # Non-atomic fallback
-                items = await self._redis.zrange(key, 0, 0)
+                items: list[Any] = await redis.zrange(key, 0, 0)
                 if not items:
                     return None
-                job_id = items[0]
-                await self._redis.zrem(key, job_id)
+                job_id = str(items[0])
+                await redis.zrem(key, job_id)
                 return job_id
-
-            return result
         except Exception as e:
             logger.warning("Redis dequeue error: %s", e)
             return None
@@ -225,17 +229,18 @@ class PriorityQueue:
     ) -> int | None:
         """Get the current position of a job in the queue."""
         if self._redis:
+            redis = self._redis
             key = self.QUEUE_KEYS[priority]
             try:
                 if lua_scripts.queue_position_sha:
-                    position = await self._redis.evalsha(
+                    position: Any = await redis.evalsha(  # type: ignore[misc]
                         lua_scripts.queue_position_sha,
                         1,
                         key,
                         job_id,
                     )
                 else:
-                    position = await self._redis.zrank(key, job_id)
+                    position = await redis.zrank(key, job_id)
                     if position is not None:
                         position += 1
 
@@ -253,9 +258,10 @@ class PriorityQueue:
     async def remove(self, job_id: str, priority: QueuePriority) -> bool:
         """Remove a job from the queue."""
         if self._redis:
+            redis = self._redis
             key = self.QUEUE_KEYS[priority]
             try:
-                removed = await self._redis.zrem(key, job_id)
+                removed: int = await redis.zrem(key, job_id)
                 return removed > 0
             except Exception as e:
                 logger.warning("Redis remove error: %s", e)
@@ -311,7 +317,7 @@ class PriorityQueue:
         self,
         priority: QueuePriority,
         limit: int = 50,
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """
         Get jobs in a specific queue with their timestamps.
 
@@ -334,7 +340,7 @@ class PriorityQueue:
         queue = self._local_queues[priority][:limit]
         return [{"job_id": job_id, "enqueued_at": score} for job_id, score in queue]
 
-    async def get_queue_jobs_all(self, limit: int = 50) -> dict[str, list[dict]]:
+    async def get_queue_jobs_all(self, limit: int = 50) -> dict[str, list[dict[str, Any]]]:
         """
         Get jobs from all priority queues.
 

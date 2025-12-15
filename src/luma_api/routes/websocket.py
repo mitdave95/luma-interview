@@ -21,7 +21,7 @@ router = APIRouter(tags=["WebSocket"])
 class DashboardConnectionManager:
     """Manage WebSocket connections for the dashboard."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.active_connections: list[WebSocket] = []
         self._recent_requests: list[dict[str, Any]] = []
         self._max_recent_requests = 100

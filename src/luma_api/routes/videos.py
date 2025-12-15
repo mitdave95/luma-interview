@@ -1,5 +1,6 @@
 """Video endpoints."""
 
+from typing import Any
 
 from fastapi import APIRouter, Depends, Query
 
@@ -76,7 +77,7 @@ async def get_video_stream(
     video_id: str,
     user: User = Depends(get_current_user),
     video_service: VideoService = Depends(get_video_service),
-):
+) -> dict[str, Any]:
     """
     Get the streaming URL for a video.
 
@@ -104,7 +105,7 @@ async def delete_video(
     video_id: str,
     user: User = Depends(get_current_user),
     video_service: VideoService = Depends(get_video_service),
-):
+) -> None:
     """
     Delete a video.
 
@@ -112,4 +113,3 @@ async def delete_video(
     Only the video owner can delete their videos.
     """
     video_service.delete_video(video_id, user)
-    return None

@@ -1,6 +1,6 @@
 """FastAPI authentication dependencies."""
 
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 
 from fastapi import Depends, Header
 
@@ -34,7 +34,7 @@ async def get_current_user(
     return auth_service.validate_api_key(api_key)
 
 
-def require_tier(minimum_tier: UserTier) -> Callable[..., User]:
+def require_tier(minimum_tier: UserTier) -> Callable[..., Awaitable[User]]:
     """
     Create a dependency that requires a minimum user tier.
 
@@ -82,7 +82,7 @@ async def get_optional_user(
         return None
 
 
-def require_permission(permission: str) -> Callable[..., User]:
+def require_permission(permission: str) -> Callable[..., Awaitable[User]]:
     """
     Create a dependency that requires a specific permission.
 

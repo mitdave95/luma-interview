@@ -1,5 +1,6 @@
 """Video generation endpoints."""
 
+from typing import Any
 
 from fastapi import APIRouter, Depends, status
 
@@ -96,7 +97,7 @@ async def batch_generate_videos(
 )
 async def list_models(
     user: User = Depends(require_tier(UserTier.FREE)),
-):
+) -> dict[str, Any]:
     """
     List available video generation models.
 

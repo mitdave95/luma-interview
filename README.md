@@ -14,6 +14,9 @@
 ### Run Frontend Server
   `make frontend-dev` # http://localhost:5173/
 
+For scraping service, ANTHROPIC_API_KEY set in terminal
+`export ANTHROPIC_API_KEY={YOUR_KEY}`
+
 ### Test with API keys
   `curl -H "X-API-Key: dev_test_key" http://localhost:8000/v1/account/quota`
   `curl -X POST -H "X-API-Key: dev_test_key" -H "Content-Type: application/json" -d '{"prompt": "A sunset over mountains"}' http://localhost:8000/v1/generate`

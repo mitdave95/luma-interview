@@ -33,6 +33,10 @@ class Settings(BaseSettings):
     worker_enabled: bool = True
     worker_poll_interval: float = 0.5
 
+    # Scraping
+    anthropic_api_key: str = ""
+    playwright_ws_endpoint: str = ""  # Remote Playwright WebSocket endpoint (e.g., ws://playwright:3000)
+
     model_config = {"env_prefix": "", "case_sensitive": False}
 
 

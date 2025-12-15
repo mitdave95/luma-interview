@@ -1,5 +1,10 @@
 """Redis Lua scripts for atomic operations."""
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from redis.asyncio import Redis
+
 # Sliding window rate limit check and increment
 # Keys: [rate_limit_key]
 # Args: [window_seconds, limit, current_time, request_id]
@@ -116,7 +121,7 @@ return {daily, monthly}
 class LuaScripts:
     """Manager for Lua script SHA hashes."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.rate_limit_sha: str | None = None
         self.queue_enqueue_sha: str | None = None
         self.queue_dequeue_sha: str | None = None
@@ -124,7 +129,7 @@ class LuaScripts:
         self.usage_increment_sha: str | None = None
         self._loaded = False
 
-    async def load(self, redis_client) -> None:
+    async def load(self, redis_client: "Redis") -> None:
         """Load all scripts into Redis and store SHA hashes."""
         if self._loaded:
             return

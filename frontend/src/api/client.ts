@@ -151,4 +151,18 @@ export async function makeBulkRequests<T>(
   return results;
 }
 
+// Scraping API functions
+export interface ScrapeResponse {
+  markdown: string;
+  url: string | null;
+  source: string;
+}
+
+export async function scrapeWithPlaywright(url: string): Promise<ScrapeResponse> {
+  const response = await apiClient.post<ScrapeResponse>('/scrape/playwright', { url }, {
+    timeout: 120000, // 2 minute timeout for scraping
+  });
+  return response.data;
+}
+
 export default apiClient;

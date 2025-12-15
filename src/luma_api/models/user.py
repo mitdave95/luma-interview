@@ -1,6 +1,7 @@
 """User models."""
 
 from datetime import UTC, datetime
+from typing import Any
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -16,6 +17,6 @@ class User(BaseModel):
     api_key: str = Field(..., description="User API key")
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     is_active: bool = Field(default=True)
-    metadata: dict | None = Field(default=None)
+    metadata: dict[str, Any] | None = Field(default=None)
 
     model_config = {"from_attributes": True}

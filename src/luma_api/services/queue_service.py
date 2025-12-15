@@ -1,6 +1,7 @@
 """Queue service for job management."""
 
 import logging
+from typing import Any
 
 from redis.asyncio import Redis
 
@@ -105,7 +106,7 @@ class QueueService:
 
         return job_id
 
-    async def get_queue_stats(self) -> dict:
+    async def get_queue_stats(self) -> dict[str, Any]:
         """Get statistics about all queues."""
         lengths = await self.queue.get_queue_lengths()
 

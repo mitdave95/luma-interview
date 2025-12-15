@@ -9,6 +9,8 @@ dependencies = [
     "pydantic[email]>=2.5.0",
     "pydantic-settings>=2.1.0",
     "redis>=5.0.0",
+    "httpx>=0.26.0",
+    "playwright>=1.49.0",
 ]
 
 [project.optional-dependencies]

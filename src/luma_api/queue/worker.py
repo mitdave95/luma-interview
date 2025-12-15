@@ -100,7 +100,7 @@ class JobWorker:
         self._generator = generator or MockVideoGenerator()
         self._running = False
         self._settings = get_settings()
-        self._task: asyncio.Task | None = None
+        self._task: asyncio.Task[None] | None = None
 
     @property
     def storage(self) -> StorageManager:

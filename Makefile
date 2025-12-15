@@ -7,7 +7,7 @@ help:
 	@echo "Setup:"
 	@echo "  make install          Install backend dependencies"
 	@echo "  make frontend-install Install frontend dependencies"
-	@echo "  make docker-up        Start Redis in Docker"
+	@echo "  make docker-up        Start Redis and Playwright in Docker"
 	@echo "  make docker-down      Stop Docker services"
 	@echo ""
 	@echo "Development:"
@@ -59,7 +59,7 @@ format:
 
 # Start Docker services
 docker-up:
-	docker-compose up -d redis
+	docker-compose up -d redis playwright
 
 # Stop Docker services
 docker-down:

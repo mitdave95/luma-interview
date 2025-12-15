@@ -3,7 +3,7 @@
 import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import Optional
+from typing import Any, Optional
 
 import redis.asyncio as redis
 from redis.asyncio import Redis
@@ -19,7 +19,7 @@ class RedisManager:
     _instance: Optional["RedisManager"] = None
     _redis: Redis | None = None
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._settings = get_settings()
         self._pool: redis.ConnectionPool | None = None
 
@@ -44,7 +44,7 @@ class RedisManager:
             self._redis = Redis(connection_pool=self._pool)
 
             # Test connection
-            await self._redis.ping()
+            await self._redis.ping()  # type: ignore[misc]
             logger.info("Connected to Redis at %s", self._settings.redis_url)
         except Exception as e:
             logger.error("Failed to connect to Redis: %s", e)
@@ -67,7 +67,7 @@ class RedisManager:
         """Get Redis client instance."""
         return self._redis
 
-    async def health_check(self) -> dict:
+    async def health_check(self) -> dict[str, Any]:
         """Check Redis health."""
         if self._redis is None:
             return {"status": "disconnected", "latency_ms": None}
@@ -76,7 +76,7 @@ class RedisManager:
             import time
 
             start = time.perf_counter()
-            await self._redis.ping()
+            await self._redis.ping()  # type: ignore[misc]
             latency = (time.perf_counter() - start) * 1000
 
             return {"status": "up", "latency_ms": round(latency, 2)}

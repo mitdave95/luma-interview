@@ -3,12 +3,13 @@
 import logging
 import uuid
 from datetime import UTC, datetime
+from typing import Any
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from luma_api.errors.exceptions import LumaAPIException, TooManyRequestsError
+from luma_api.errors.exceptions import LumaAPIError, TooManyRequestsError
 from luma_api.models.responses import ErrorDetail, ErrorResponse
 
 logger = logging.getLogger(__name__)
@@ -18,7 +19,7 @@ def create_error_response(
     error_code: str,
     message: str,
     status_code: int,
-    details: dict | None = None,
+    details: dict[str, Any] | None = None,
     request_id: str | None = None,
 ) -> JSONResponse:
     """Create a standardized error response."""
@@ -39,9 +40,9 @@ def create_error_response(
 
 async def luma_exception_handler(
     request: Request,
-    exc: LumaAPIException,
+    exc: LumaAPIError,
 ) -> JSONResponse:
-    """Handle LumaAPIException and subclasses."""
+    """Handle LumaAPIError and subclasses."""
     request_id = getattr(request.state, "request_id", None) or str(uuid.uuid4())
 
     logger.warning(
@@ -115,6 +116,6 @@ async def generic_exception_handler(
 
 def register_exception_handlers(app: FastAPI) -> None:
     """Register all exception handlers with the FastAPI app."""
-    app.add_exception_handler(LumaAPIException, luma_exception_handler)
-    app.add_exception_handler(RequestValidationError, validation_exception_handler)
+    app.add_exception_handler(LumaAPIError, luma_exception_handler)  # type: ignore[arg-type]
+    app.add_exception_handler(RequestValidationError, validation_exception_handler)  # type: ignore[arg-type]
     app.add_exception_handler(Exception, generic_exception_handler)

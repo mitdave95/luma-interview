@@ -2,7 +2,7 @@
 
 import logging
 import uuid
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
@@ -12,7 +12,7 @@ from luma_api.auth.mock_auth import get_auth_service
 from luma_api.config import get_settings
 from luma_api.errors.exceptions import TooManyRequestsError
 from luma_api.models.responses import ErrorDetail, ErrorResponse
-from luma_api.services.rate_limit_service import get_rate_limit_service
+from luma_api.services.rate_limit_service import RateLimitResult, get_rate_limit_service
 from luma_api.storage.redis_client import get_redis
 
 logger = logging.getLogger(__name__)
@@ -38,7 +38,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self._settings = get_settings()
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+    async def dispatch(
+        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
         # Add request ID to state
         request_id = str(uuid.uuid4())
         request.state.request_id = request_id
@@ -127,7 +129,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     def _add_rate_limit_headers(
         self,
         response: Response,
-        result,
+        result: RateLimitResult,
         request_id: str,
     ) -> None:
         """Add rate limit headers to response."""

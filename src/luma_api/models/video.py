@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field
 
 
 class VideoStatus(str, Enum):
@@ -55,8 +55,8 @@ class Video(BaseModel):
     aspect_ratio: AspectRatio = Field(default=AspectRatio.RATIO_16_9)
     style: VideoStyle | None = Field(default=None)
     status: VideoStatus = Field(..., description="Current processing status")
-    url: HttpUrl | None = Field(default=None, description="Video URL when ready")
-    thumbnail_url: HttpUrl | None = Field(default=None, description="Thumbnail URL")
+    url: str | None = Field(default=None, description="Video URL when ready")
+    thumbnail_url: str | None = Field(default=None, description="Thumbnail URL")
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     owner_id: str = Field(..., description="ID of the user who owns this video")
